@@ -1,0 +1,13 @@
+[phases]
+# Install dependencies and build for the frontend
+[phases.build]
+command = "npm install && npm run build"
+
+[start]
+# Serve the built frontend (using Vite preview or another method)
+command = "npm run preview"
+
+[build]
+# Specify the frontend environment
+languages = ["nodejs"]
+nodejs_version = "18.x"

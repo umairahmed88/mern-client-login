@@ -1,0 +1,35 @@
+# Ignore node_modules directory
+node_modules/
+
+# Ignore environment variable files
+.env
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Ignore build output
+dist/
+dist-ssr/
+out/
+
+# Ignore static assets
+public/static/
+
+# Ignore local development files
+*.local
+
+# Ignore generated files
+*.lock
+*.lockfile
+
+# Ignore cache
+.cache/
+.vite/
