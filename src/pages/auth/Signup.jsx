@@ -21,7 +21,7 @@ const Signup = () => {
 		try {
 			dispatch(signup(formData)).unwrap();
 			setFormData("");
-			navigate("/");
+			navigate("/signin");
 		} catch (err) {
 			console.error("Error signing up: ", err);
 		}
