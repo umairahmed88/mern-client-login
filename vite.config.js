@@ -8,7 +8,7 @@ export default defineConfig({
 		host: true,
 		proxy: {
 			"/api": {
-				target: "https://mern-api-login-production.up.railway.app",
+				target: "https://mern-api-login-production.up.railway.app/",
 				changeOrigin: true,
 			},
 		},

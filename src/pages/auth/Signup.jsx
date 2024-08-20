@@ -18,6 +18,8 @@ const Signup = () => {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
+		console.log("Form submitted");
+		console.log("Form Data:", formData);
 		try {
 			dispatch(signup(formData)).unwrap();
 			setFormData("");
@@ -27,7 +29,7 @@ const Signup = () => {
 		}
 	};
 
-	if (loading) return <div className=''>Loading...</div>;
+	// if (loading) return <div className=''>Loading...</div>;
 
 	return (
 		<div className=' max-w-2xl mx-auto'>
