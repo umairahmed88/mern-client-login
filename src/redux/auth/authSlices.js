@@ -23,6 +23,25 @@ export const signup = createAsyncThunk(
 	}
 );
 
+export const signin = createAsyncThunk(
+	"auth/signin",
+	async (userData, { rejectWithValue }) => {
+		try {
+			const response = await axios.post(`${API_URL}/signin`, userData, {
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
+			console.log(response.data);
+			return response.data;
+		} catch (err) {
+			return rejectWithValue(
+				err.response ? err.response.data : err.response.message
+			);
+		}
+	}
+);
+
 const authSlice = createSlice({
 	name: "auth",
 	initialState: {
@@ -60,6 +79,20 @@ const authSlice = createSlice({
 				state.message = action.payload.message;
 			})
 			.addCase(signup.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload.message;
+			})
+			.addCase(signin.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+				state.message = null;
+			})
+			.addCase(signin.fulfilled, (state, action) => {
+				state.loading = false;
+				state.currentUser = action.payload || action.payload.auth;
+				state.message = action.payload.message;
+			})
+			.addCase(signin.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload.message;
 			});
