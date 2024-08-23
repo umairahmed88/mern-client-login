@@ -4,7 +4,7 @@ import { REHYDRATE } from "redux-persist/es/constants";
 import storage from "redux-persist/lib/storage";
 import { persistReducer } from "redux-persist";
 
-const API_URL = "/api/v1/auth";
+const API_URL = "https://ua-mern-api-login.vercel.app/api/v1/auth";
 
 export const signup = createAsyncThunk(
 	"auth/signup",
