@@ -2,11 +2,14 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 
 export default defineConfig({
-	root: "src",
-	base: "./",
+	plugins: [react()],
 	build: {
 		outDir: "dist",
+		rollupOptions: {
+			input: "/src/index.html", //
+		},
 	},
+	base: "./",
 	server: {
 		proxy: {
 			"/api": {
@@ -16,5 +19,4 @@ export default defineConfig({
 			},
 		},
 	},
-	plugins: [react()],
 });
