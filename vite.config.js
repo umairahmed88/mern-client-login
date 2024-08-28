@@ -5,7 +5,7 @@ export default defineConfig({
 	server: {
 		proxy: {
 			"/api": {
-				target: "https://ua-mern-api-login.vercel.app",
+				target: "https://ua-mern-api.vercel.app",
 				changeOrigin: true,
 				secure: true, // Use true if your backend uses HTTPS
 			},
