@@ -7,7 +7,7 @@ export default defineConfig({
 			"/api": {
 				target: "https://ua-mern-api.vercel.app",
 				changeOrigin: true,
-				secure: true, // Use true if your backend uses HTTPS
+				secure: true,
 			},
 		},
 	},

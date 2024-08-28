@@ -3,12 +3,13 @@ import Home from "./pages/Home";
 import Signin from "./pages/auth/Signin";
 import Signup from "./pages/auth/Signup";
 import Header from "./components/Header";
+import VerifyEmail from "./components/VerifyEmail";
 
 const routes = [
 	{ path: "/", element: <Home /> },
 	{ path: "/signup", element: <Signup /> },
 	{ path: "/signin", element: <Signin /> },
-	// { path: "", element: "" },
+	{ path: "/verify-email", element: <VerifyEmail /> },
 	// { path: "", element: "" },
 ];
 
