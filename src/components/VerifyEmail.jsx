@@ -16,12 +16,18 @@ const VerifyEmail = () => {
 				if (response.data.message === "Email verified successfully") {
 					navigate("/signin");
 				} else {
-					console.error("Verification failed:", response.data.message);
+					console.error(
+						"Verification failed:",
+						response && response.data.message
+					);
 				}
 
 				console.log("Token received:", token);
 			} catch (error) {
-				console.error("Error verifying email:", error.response.data);
+				console.error(
+					"Error verifying email:",
+					error.response ? error.response.data : error.message
+				);
 			}
 		};
 
