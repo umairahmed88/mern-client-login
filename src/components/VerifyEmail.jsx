@@ -17,7 +17,7 @@ const VerifyEmail = () => {
 					navigate("/signin");
 				}
 			} catch (error) {
-				console.error("Error verifying email:", error);
+				console.error("Error verifying email:", error.response.data);
 			}
 		};
 
