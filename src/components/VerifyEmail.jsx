@@ -19,6 +19,7 @@ const VerifyEmail = () => {
 				} else {
 					console.error("Verification failed:", response.data.message);
 				}
+				console.log(response.data);
 
 				console.log("Token received:", token);
 			} catch (error) {
