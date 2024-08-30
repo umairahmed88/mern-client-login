@@ -14,9 +14,10 @@ const VerifyEmail = () => {
 					`https://ua-mern-api.vercel.app/api/v1/auth/verify-email?token=${token}`
 				);
 
-				console.log(response.data);
-
-				console.log("Token received: ", token);
+				if (response) {
+					console.log("Email verification successful.");
+					navigate("/signin");
+				}
 			} catch (error) {
 				if (error.response) {
 					console.error(
