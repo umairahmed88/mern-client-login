@@ -16,20 +16,16 @@ const VerifyEmail = () => {
 
 				console.log(response.data);
 
-				console.log("Token received:", token);
+				console.log("Token received: ", token);
 			} catch (error) {
-				// Log detailed error information
 				if (error.response) {
-					// Error from the server
 					console.error(
 						"Server-side error verifying email:",
 						error.response.data.message
 					);
 				} else if (error.request) {
-					// No response was received
 					console.error("No response received:", error.request);
 				} else {
-					// Other errors
 					console.error("Error verifying email:", error.message);
 				}
 			}
