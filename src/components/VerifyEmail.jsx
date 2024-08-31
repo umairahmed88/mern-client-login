@@ -16,7 +16,7 @@ const VerifyEmail = () => {
 
 				if (response) {
 					console.log("Email verification successful.");
-					// navigate("/signin");
+					navigate("/signin");
 				}
 			} catch (error) {
 				if (error.response) {
