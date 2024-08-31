@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const VerifyEmail = () => {
 	const navigate = useNavigate();
@@ -14,20 +16,25 @@ const VerifyEmail = () => {
 					`https://ua-mern-api.vercel.app/api/v1/auth/verify-email?token=${token}`
 				);
 
-				if (response) {
-					console.log("Email verification successful.");
+				if (response.data.message === "Email already verified") {
+					toast.info("Your email is already verified. Please sign in.");
 					navigate("/signin");
+				} else {
+					toast.success("Email verification successful.");
 				}
+
+				navigate("/signin");
 			} catch (error) {
 				if (error.response) {
-					console.error(
-						"Server-side error verifying email:",
-						error.response.data.message
-					);
+					toast.error(`Error verifying email: ${error.response.data.message}`);
 				} else if (error.request) {
-					console.error("No response received:", error.request);
+					toast.error(
+						"No response received from server. Please try again later."
+					);
 				} else {
-					console.error("Error verifying email:", error.message);
+					toast.error(
+						"An error occurred during verification. Please try again."
+					);
 				}
 			}
 		};
