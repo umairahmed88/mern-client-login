@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { clearError, clearMessage, signin } from "../../redux/auth/authSlices";
 import { useClearState } from "../../hooks/useClearState";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Signin = () => {
 	const { loading, message, error } = useSelector((state) => state.auth);
@@ -28,7 +29,7 @@ const Signin = () => {
 			}
 			setFormData("");
 		} catch (err) {
-			console.error("Error signing in: ", err);
+			toast.error("Error signing in.");
 		}
 	};
 

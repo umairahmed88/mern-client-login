@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { clearError, clearMessage, signup } from "../../redux/auth/authSlices";
 import { useClearState } from "../../hooks/useClearState";
+import { toast } from "react-toastify";
 
 const Signup = () => {
 	const [formData, setFormData] = useState("");
@@ -21,8 +22,6 @@ const Signup = () => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		console.log("Form submitted");
-		console.log("Form Data:", formData);
 		try {
 			const res = await dispatch(signup(formData)).unwrap();
 			if (res) {
@@ -30,7 +29,7 @@ const Signup = () => {
 			}
 			setFormData("");
 		} catch (err) {
-			console.error("Error signing up: ", err);
+			toast.error("Error signing up.", err);
 		}
 	};
 

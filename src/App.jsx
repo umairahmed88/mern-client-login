@@ -4,6 +4,8 @@ import Signin from "./pages/auth/Signin";
 import Signup from "./pages/auth/Signup";
 import Header from "./components/Header";
 import VerifyEmail from "./components/VerifyEmail";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const routes = [
 	{ path: "/", element: <Home /> },
@@ -22,6 +24,7 @@ const App = () => {
 					<Route path={route.path} element={route.element} key={route.path} />
 				))}
 			</Routes>
+			<ToastContainer />
 		</Router>
 	);
 };

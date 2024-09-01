@@ -94,7 +94,7 @@ const authSlice = createSlice({
 			})
 			.addCase(signin.rejected, (state, action) => {
 				state.loading = false;
-				state.error = action.payload.message;
+				state.error = action.payload.message || action.payload;
 			});
 	},
 });
