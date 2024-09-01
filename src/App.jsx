@@ -6,12 +6,14 @@ import Header from "./components/Header";
 import VerifyEmail from "./components/VerifyEmail";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Profile from "./pages/auth/Profile";
 
 const routes = [
 	{ path: "/", element: <Home /> },
 	{ path: "/signup", element: <Signup /> },
 	{ path: "/signin", element: <Signin /> },
 	{ path: "/verify-email", element: <VerifyEmail /> },
+	{ path: "/profile", element: <Profile /> },
 	// { path: "", element: "" },
 ];
 
