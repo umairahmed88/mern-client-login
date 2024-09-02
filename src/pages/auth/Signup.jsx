@@ -162,8 +162,11 @@ const Signup = () => {
 						)}
 					</div>
 
-					<button className=' bg-zinc-500 p-3 rounded-lg hover:opacity-90 text-white font-bold text-xl'>
-						Signup
+					<button
+						disabled={loading || uploading}
+						className=' bg-zinc-500 p-3 rounded-lg hover:opacity-90 disabled:opacity-80 text-white font-bold text-xl'
+					>
+						{loading ? "Signing up..." : "Signup"}
 					</button>
 					{error && <p className=' text-red-700'>{error}</p>}
 					{message && <p className=' text-green-700'>{message}</p>}
