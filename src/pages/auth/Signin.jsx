@@ -25,7 +25,7 @@ const Signin = () => {
 		try {
 			const res = await dispatch(signin(formData)).unwrap();
 			if (res) {
-				navigate("/");
+				navigate("/profile");
 			}
 			setFormData("");
 		} catch (err) {
