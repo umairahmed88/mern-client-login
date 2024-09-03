@@ -42,6 +42,29 @@ export const signin = createAsyncThunk(
 	}
 );
 
+export const updateUser = createAsyncThunk(
+	"auth/updateUser",
+	async ({ id, userData }, { getState, rejectWithValue }) => {
+		try {
+			const token = getState().auth.currentUser.sanitizedUser.token;
+			const response = await axios.put(
+				`${API_URL}/update-user/${id}`,
+				userData,
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+						"Content-Type": "application/json",
+					},
+				}
+			);
+			console.log(response.data);
+			return response.data;
+		} catch (err) {
+			return rejectWithValue(err.response ? err.response.data : err.message);
+		}
+	}
+);
+
 export const signout = createAsyncThunk(
 	"auth/signout",
 	async (_, { getState, rejectWithValue }) => {
@@ -114,6 +137,20 @@ const authSlice = createSlice({
 				state.message = action.payload.message;
 			})
 			.addCase(signin.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload.message;
+			})
+			.addCase(updateUser.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+				state.message = null;
+			})
+			.addCase(updateUser.fulfilled, (state, action) => {
+				state.loading = false;
+				state.currentUser = action.payload || action.payload.auth;
+				state.message = action.payload.message;
+			})
+			.addCase(updateUser.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload.message;
 			})
