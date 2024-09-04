@@ -72,8 +72,8 @@ export const signout = createAsyncThunk(
 			const token = getState().auth.currentUser.sanitizedUser.token;
 			const response = await axios.post(`${API_URL}/signout`, {
 				headers: {
-					"Content-Type": "application/json",
 					Authorization: `Bearer ${token}`,
+					"Content-Type": "application/json",
 				},
 			});
 			console.log(response.data);
