@@ -9,6 +9,7 @@ import {
 import {
 	getDownloadURL,
 	getStorage,
+	ref,
 	uploadBytesResumable,
 } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
