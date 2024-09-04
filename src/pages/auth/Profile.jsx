@@ -79,8 +79,8 @@ const Profile = () => {
 				updateUser({
 					id: currentUser?.sanitizedUser.id,
 					userData: formData,
-				}).unwrap()
-			);
+				})
+			).unwrap();
 
 			if (res) {
 				toast.success("Your profile is updated.");
