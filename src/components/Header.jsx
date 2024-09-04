@@ -4,8 +4,6 @@ import { Link } from "react-router-dom";
 const links = [
 	{ name: "Home", to: "/" },
 	{ name: "Signup", to: "/signup" },
-	// { name: "Signin", to: "/signin" },
-	// { name: "", to: "" },
 ];
 
 const Header = () => {
