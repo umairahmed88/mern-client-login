@@ -7,13 +7,13 @@ import VerifyEmail from "./components/VerifyEmail";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Profile from "./pages/auth/Profile";
+import PrivateRoute from "./components/PrivateRoute";
 
 const routes = [
 	{ path: "/", element: <Home /> },
 	{ path: "/signup", element: <Signup /> },
 	{ path: "/signin", element: <Signin /> },
 	{ path: "/verify-email", element: <VerifyEmail /> },
-	{ path: "/profile", element: <Profile /> },
 	// { path: "", element: "" },
 ];
 
@@ -25,6 +25,9 @@ const App = () => {
 				{routes.map((route) => (
 					<Route path={route.path} element={route.element} key={route.path} />
 				))}
+				<Route element={<PrivateRoute />}>
+					<Route path='/profile' element={<Profile />} />
+				</Route>
 			</Routes>
 			<ToastContainer />
 		</Router>
