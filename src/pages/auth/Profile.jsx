@@ -85,6 +85,8 @@ const Profile = () => {
 
 			if (res) {
 				toast.success("Your profile is updated.");
+				await dispatch(signout()).unwrap();
+				toast.info("You've been signed out. Please sign in again.");
 			}
 		} catch (err) {
 			toast.error("Error updating profile.");
