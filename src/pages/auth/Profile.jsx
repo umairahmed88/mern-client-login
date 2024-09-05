@@ -58,7 +58,7 @@ const Profile = () => {
 				const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
 				dispatch(
 					updateUser({
-						id: currentUser.sanitizedUser.id,
+						id: currentUser.sanitizedUser?.id,
 						userData: { avatar: downloadURL },
 					})
 				);
@@ -78,7 +78,7 @@ const Profile = () => {
 		try {
 			const res = await dispatch(
 				updateUser({
-					id: currentUser?.sanitizedUser.id,
+					id: currentUser?.sanitizedUser?.id,
 					userData: formData,
 				})
 			).unwrap();
