@@ -112,7 +112,7 @@ const Profile = () => {
 	return (
 		<div className=' max-w-2xl mx-auto p-2'>
 			<h1 className=' text-2xl font-bold m-3 text-center'>Profile</h1>
-			{/* <div className=''>
+			<div className=''>
 				<div className=' flex justify-center items-center'>
 					<img
 						src={currentUser?.sanitizedUser?.avatar}
@@ -142,7 +142,7 @@ const Profile = () => {
 						hidden
 					/>
 					<img
-						src={currentUser?.sanitizedUser?.avatar}
+						src={currentUser?.sanitizedUser?.avatar || "default-avatar.png"}
 						alt='profile image'
 						className=' rounded-full h-28 w-28 object-contain self-center cursor-pointer'
 						onClick={() => fileRef.current.click()}
@@ -200,7 +200,7 @@ const Profile = () => {
 				>
 					Signout
 				</button>
-			</div> */}
+			</div>
 		</div>
 	);
 };
