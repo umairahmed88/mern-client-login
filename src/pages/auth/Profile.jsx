@@ -113,7 +113,7 @@ const Profile = () => {
 			<div className=''>
 				<div className=' flex justify-center items-center'>
 					<img
-						src={currentUser?.sanitizedUser.avatar}
+						src={currentUser?.sanitizedUser?.avatar}
 						alt='profile image'
 						className='rounded-full h-28 w-28 object-contain'
 					/>
