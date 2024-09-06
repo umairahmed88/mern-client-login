@@ -100,7 +100,6 @@ const Profile = () => {
 
 			if (res) {
 				toast.success("Signed out.");
-				navigate("/signin");
 			}
 		} catch (err) {
 			console.error("Error signing out", err);
