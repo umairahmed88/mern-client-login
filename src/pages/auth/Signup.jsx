@@ -93,7 +93,7 @@ const Signup = () => {
 		try {
 			const res = await dispatch(signup(formData)).unwrap();
 			if (res) {
-				navigate("/signin");
+				// navigate("/signin");
 			}
 			setFormData("");
 		} catch (err) {
