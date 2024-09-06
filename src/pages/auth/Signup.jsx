@@ -50,7 +50,7 @@ const Signup = () => {
 				toast.error("Error uploading image");
 				toast.error(error);
 			},
-			() => {
+			async () => {
 				getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
 					setFormData({ ...formData, avatar: downloadURL });
 					setUploading(false);

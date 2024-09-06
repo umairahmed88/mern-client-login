@@ -88,6 +88,7 @@ const Profile = () => {
 				await dispatch(signout()).unwrap();
 				toast.info("You've been signed out. Please sign in again.");
 			}
+			setFormData("");
 		} catch (err) {
 			toast.error("Error updating profile.");
 			console.error("Error updating: ", err);
@@ -114,10 +115,7 @@ const Profile = () => {
 			<div className=''>
 				<div className=' flex justify-center items-center'>
 					<img
-						src={
-							currentUser?.sanitizedUser?.avatar ||
-							"https://media.istockphoto.com/id/1451587807/vector/user-profile-icon-vector-avatar-or-person-icon-profile-picture-portrait-symbol-vector.jpg?s=612x612&w=0&k=20&c=yDJ4ITX1cHMh25Lt1vI1zBn2cAKKAlByHBvPJ8gEiIg="
-						}
+						src={currentUser?.sanitizedUser?.avatar}
 						alt='profile image'
 						className='rounded-full h-28 w-28 object-contain'
 					/>
