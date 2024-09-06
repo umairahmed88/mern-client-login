@@ -57,11 +57,16 @@ const Signup = () => {
 				toast.error(error);
 			},
 			async () => {
-				getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-					setFormData({ ...formData, avatar: downloadURL });
+				try {
+					const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+					setFormData((prevData) => ({ ...prevData, avatar: downloadURL }));
 					setUploading(false);
 					toast.success("Image uploaded");
-				});
+				} catch (error) {
+					setFileUploadError(true);
+					setUploading(false);
+					toast.error("Error retrieving image URL");
+				}
 			}
 		);
 	};
@@ -78,7 +83,7 @@ const Signup = () => {
 		try {
 			const res = await dispatch(signup(formData)).unwrap();
 			if (res) {
-				// navigate("/signin");
+				navigate("/signin");
 			}
 			setFormData("");
 		} catch (err) {
