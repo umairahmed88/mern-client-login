@@ -60,6 +60,7 @@ const Signup = () => {
 				try {
 					const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
 					setFormData((prevData) => ({ ...prevData, avatar: downloadURL }));
+					console.log("downloadURL:", downloadURL);
 					setUploading(false);
 					toast.success("Image uploaded");
 				} catch (error) {
@@ -80,6 +81,11 @@ const Signup = () => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+
+		if (!formData.avatar) {
+			return toast.error("Please upload a profile image before signing up.");
+		}
+
 		try {
 			const res = await dispatch(signup(formData)).unwrap();
 			if (res) {
