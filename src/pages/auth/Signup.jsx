@@ -16,7 +16,13 @@ const Signup = () => {
 	const { loading, message, error } = useSelector((state) => state.auth);
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
-	const [formData, setFormData] = useState({});
+	const [formData, setFormData] = useState({
+		username: "",
+		email: "",
+		password: "",
+		confirmPassword: "",
+		avatar: null,
+	});
 	const [file, setFile] = useState(null);
 	const [uploading, setUploading] = useState(false);
 	const [fileUploadError, setFileUploadError] = useState(false);
