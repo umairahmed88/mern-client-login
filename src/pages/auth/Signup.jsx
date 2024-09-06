@@ -85,10 +85,15 @@ const Signup = () => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		
+		const signupData = {
+		  ...formData,
+		  avatar: avatarUrl,
+		};
+		const avatarUrl = formData.avatar || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png";
 
-		if (!formData.avatar) {
-			return toast.error("Please upload a profile image before signing up.");
-		}
+	  
+
 
 		try {
 			const res = await dispatch(signup(formData)).unwrap();
