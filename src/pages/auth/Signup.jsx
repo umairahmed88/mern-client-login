@@ -34,6 +34,10 @@ const Signup = () => {
 		}
 	}, [file]);
 
+	useEffect(() => {
+		console.log("formData:", formData);
+	}, [formData]);
+
 	useClearState(dispatch, clearError, clearMessage);
 
 	const handleUploadFile = (file) => {
