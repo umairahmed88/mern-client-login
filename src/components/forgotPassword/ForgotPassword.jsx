@@ -7,7 +7,7 @@ import {
 	forgotPassword,
 } from "../../redux/auth/authSlices";
 import { toast } from "react-toastify";
-import { useClearState } from "../utils/useClearState";
+import { useClearState } from "../../hooks/useClearState";
 
 const ForgotPassword = () => {
 	const [email, setEmail] = useState("");

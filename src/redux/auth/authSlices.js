@@ -81,6 +81,24 @@ export const forgotPassword = createAsyncThunk(
 	}
 );
 
+export const resetPassword = createAsyncThunk(
+	"auth/resetPassword",
+	async ({ token, newPassword, confirmNewPassword }, { rejectWithValue }) => {
+		try {
+			const response = await axios.post(
+				`${API_URL}/reset-password?token=${token}`,
+				{ newPassword, confirmNewPassword },
+				{
+					headers: { "Content-Type": "application/json" },
+				}
+			);
+			return response.data;
+		} catch (err) {
+			return rejectWithValue(err.response ? err.response.data : err.message);
+		}
+	}
+);
+
 export const updateUser = createAsyncThunk(
 	"auth/updateUser",
 	async ({ id, userData }, { getState, rejectWithValue }) => {
@@ -214,6 +232,21 @@ const authSlice = createSlice({
 			.addCase(googleAuth.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload?.message;
+			})
+			.addCase(resetPassword.pending, (state) => {
+				state.loading = true;
+				state.message = null;
+				state.error = null;
+			})
+			.addCase(resetPassword.fulfilled, (state, action) => {
+				state.loading = false;
+				state.message = action.payload.message;
+			})
+			.addCase(resetPassword.rejected, (state, action) => {
+				state.loading = false;
+				state.error =
+					action.payload?.message ||
+					"An error occurred while resetting the password";
 			})
 			.addCase(updateUser.pending, (state) => {
 				state.loading = true;
