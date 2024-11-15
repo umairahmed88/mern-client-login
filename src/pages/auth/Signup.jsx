@@ -238,7 +238,7 @@ const Signup = () => {
 
 				<button
 					disabled={uploading || loading || (file && filePerc < 100)}
-					className='w-full py-3 bg-zinc-500 text-white rounded-lg hover:bg-indigo-500 transition-opacity disabled:opacity-75'
+					className='w-full py-3 bg-zinc-500 text-white rounded-lg hover:bg-zinc-600 transition-opacity disabled:opacity-75'
 				>
 					{loading ? "Signing up..." : "Sign Up"}
 				</button>
