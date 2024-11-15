@@ -3,6 +3,7 @@ import axios from "axios";
 import { REHYDRATE } from "redux-persist/es/constants";
 import storage from "redux-persist/lib/storage";
 import { persistReducer } from "redux-persist";
+import { getAuthToken } from "../../hooks/getAuthToken/GetAuthToken";
 
 const API_URL = "https://ua-mern-api.vercel.app/api/v1/auth";
 
@@ -42,11 +43,51 @@ export const signin = createAsyncThunk(
 	}
 );
 
+export const googleAuth = createAsyncThunk(
+	"auth/googleAuth",
+	async (googleUserData, { rejectWithValue }) => {
+		try {
+			const response = await axios.post(
+				`${API_URL}/signin-google`,
+				googleUserData,
+				{
+					headers: { "Content-Type": "application/json" },
+				}
+			);
+			return response.data;
+		} catch (err) {
+			return rejectWithValue(err.response ? err.response.data : err.message);
+		}
+	}
+);
+
+export const forgotPassword = createAsyncThunk(
+	"auth/forgotPassword",
+	async ({ email }, { rejectWithValue }) => {
+		try {
+			const response = await axios.post(
+				`${API_URL}/forgot-password`,
+				{ email },
+				{
+					headers: {
+						"Content-Type": "application/json",
+					},
+				}
+			);
+			return response.data;
+		} catch (err) {
+			return rejectWithValue(err.response ? err.response.data : err.message);
+		}
+	}
+);
+
 export const updateUser = createAsyncThunk(
 	"auth/updateUser",
 	async ({ id, userData }, { getState, rejectWithValue }) => {
 		try {
-			const token = getState().auth.currentUser.sanitizedUser.token;
+			const token = getAuthToken(getState, rejectWithValue);
+
+			if (!token) return rejectWithValue({ message: "Please login." });
 			const response = await axios.put(
 				`${API_URL}/update-user/${id}`,
 				userData,
@@ -118,8 +159,8 @@ const authSlice = createSlice({
 			})
 			.addCase(signup.pending, (state) => {
 				state.loading = true;
-				state.error = null;
 				state.message = null;
+				state.error = null;
 			})
 			.addCase(signup.fulfilled, (state, action) => {
 				state.loading = false;
@@ -127,7 +168,8 @@ const authSlice = createSlice({
 			})
 			.addCase(signup.rejected, (state, action) => {
 				state.loading = false;
-				state.error = action.payload.message;
+				state.error =
+					action.payload?.message || "An error occurred, signup failed";
 			})
 			.addCase(signin.pending, (state) => {
 				state.loading = true;
@@ -141,7 +183,37 @@ const authSlice = createSlice({
 			})
 			.addCase(signin.rejected, (state, action) => {
 				state.loading = false;
-				state.error = action.payload.message;
+				state.error =
+					action.payload?.message || "An error occurred while signing in";
+			})
+			.addCase(forgotPassword.pending, (state) => {
+				state.loading = true;
+				state.message = null;
+				state.error = null;
+			})
+			.addCase(forgotPassword.fulfilled, (state, action) => {
+				state.loading = false;
+				state.message = action.payload.message;
+			})
+			.addCase(forgotPassword.rejected, (state, action) => {
+				state.loading = false;
+				state.error =
+					action.payload?.message ||
+					"An error occurred while reset the password";
+			})
+			.addCase(googleAuth.pending, (state) => {
+				state.loading = true;
+				state.message = null;
+				state.error = null;
+			})
+			.addCase(googleAuth.fulfilled, (state, action) => {
+				state.loading = false;
+				state.currentUser = action.payload || action.payload.auth;
+				state.message = action.payload.message;
+			})
+			.addCase(googleAuth.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload?.message;
 			})
 			.addCase(updateUser.pending, (state) => {
 				state.loading = true;
@@ -169,7 +241,8 @@ const authSlice = createSlice({
 			})
 			.addCase(signout.rejected, (state, action) => {
 				state.loading = false;
-				state.error = action.payload.message || action.payload;
+				state.error =
+					action.payload?.message || "An error occurred while updating";
 			});
 	},
 });

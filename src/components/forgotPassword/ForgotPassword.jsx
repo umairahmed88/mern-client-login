@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+/* eslint-disable no-unused-vars */
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
 	clearError,
 	clearMessage,
 	forgotPassword,
-} from "../redux/auth/authSlices";
+} from "../../redux/auth/authSlices";
 import { toast } from "react-toastify";
 import { useClearState } from "../utils/useClearState";
 
