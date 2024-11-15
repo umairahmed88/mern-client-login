@@ -1,9 +1,10 @@
+/* eslint-disable no-mixed-spaces-and-tabs */
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { clearError, clearMessage, signup } from "../../redux/auth/authSlices";
-import { useClearState } from "../../hooks/useClearState";
 import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
+import { signup } from "../../redux/auth/authSlices";
 import {
 	getDownloadURL,
 	getStorage,
@@ -11,22 +12,56 @@ import {
 	uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "../../firebase";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import GoogleAuth from "../../components/googleAuth/GoogleAuth";
+import ForgotPassword from "../../components/forgotPassword/ForgotPassword";
+
+const passwordRequirementsMessage =
+	"Password is required and it must contain at least 8 characters, an uppercase letter, a lowercase letter, and a number";
+
+const schema = yup.object().shape({
+	username: yup.string().required("Username is required"),
+	email: yup.string().email("Invalid email").required("Email is required"),
+	password: yup
+		.string()
+		.required(passwordRequirementsMessage)
+		.min(8, passwordRequirementsMessage)
+		.matches(/[A-Z]/, passwordRequirementsMessage)
+		.matches(/[a-z]/, passwordRequirementsMessage)
+		.matches(/[0-9]/, passwordRequirementsMessage)
+		.matches(/[!@#$%^&*(),.?":{}|<>]/, passwordRequirementsMessage),
+	confirmPassword: yup
+		.string()
+		.oneOf([yup.ref("password"), null], "Passwords must match")
+		.required("Confirm password is required"),
+});
 
 const Signup = () => {
-	const { loading, message, error } = useSelector((state) => state.auth);
+	const {
+		loading,
+		message: authMessage,
+		error: authError,
+	} = useSelector((state) => state.auth);
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
-	const [formData, setFormData] = useState({
-		username: "",
-		email: "",
-		password: "",
-		confirmPassword: "",
-		avatar: null,
-	});
+
+	const [visible, setVisible] = useState(false);
+	const [formData, setFormData] = useState({ avatar: "" });
 	const [file, setFile] = useState(null);
 	const [uploading, setUploading] = useState(false);
 	const [fileUploadError, setFileUploadError] = useState(false);
 	const [filePerc, setFilePerc] = useState(0);
+
+	const {
+		register,
+		handleSubmit,
+		setValue,
+		formState: { errors },
+	} = useForm({
+		resolver: yupResolver(schema),
+	});
 
 	useEffect(() => {
 		if (file) {
@@ -38,10 +73,14 @@ const Signup = () => {
 		console.log("formData:", formData);
 	}, [formData]);
 
-	useClearState(dispatch, clearError, clearMessage);
-
 	const handleUploadFile = (file) => {
+		if (file.size > 2 * 1024 * 1024) {
+			setFileUploadError(true);
+			toast.error("Image must be less than 2MB.");
+			return;
+		}
 		setUploading(true);
+
 		const storage = getStorage(app);
 		const fileName = new Date().getTime() + file.name;
 		const storageRef = ref(storage, fileName);
@@ -57,21 +96,14 @@ const Signup = () => {
 			(error) => {
 				setFileUploadError(true);
 				setUploading(false);
-				toast.error("Error uploading image");
-				toast.error(error);
+				toast.error("Error uploading image.");
 			},
 			async () => {
-				try {
-					const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-					setFormData((prevData) => ({ ...prevData, avatar: downloadURL }));
-					console.log("downloadURL:", downloadURL);
-					setUploading(false);
-					toast.success("Image uploaded");
-				} catch (error) {
-					setFileUploadError(true);
-					setUploading(false);
-					toast.error("Error retrieving image URL");
-				}
+				const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
+				setFormData((prevData) => ({ ...prevData, avatar: downloadUrl }));
+				setValue("avatar", downloadUrl);
+				setUploading(false);
+				toast.success("Image uploaded.");
 			}
 		);
 	};
@@ -83,26 +115,18 @@ const Signup = () => {
 		});
 	};
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-		
-		const signupData = {
-		  ...formData,
-		  avatar: avatarUrl,
-		};
-		const avatarUrl = formData.avatar || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png";
-
-	  
-
-
+	const onSubmit = async (data) => {
+		const completeData = { ...data, ...formData };
 		try {
-			const res = await dispatch(signup(formData)).unwrap();
+			const res = await dispatch(signup(completeData)).unwrap();
 			if (res) {
-				// navigate("/signin");
+				setFormData({});
+				setFile(null);
+				toast.success("Signup successful! Please verify your email.");
+				navigate("/signin");
 			}
-			setFormData("");
 		} catch (err) {
-			toast.error("Error signing up.", err);
+			console.error("Error during signup:", err);
 		}
 	};
 
@@ -118,97 +142,123 @@ const Signup = () => {
 	return (
 		<div className=' max-w-2xl mx-auto'>
 			<h1 className=' text-2xl font-bold m-3 text-center'>Signup</h1>
-			<div className=''>
-				<form onSubmit={handleSubmit} className='flex flex-col gap-3'>
-					<input
-						type='text'
-						className='border-2 p-3 rounded-lg'
-						placeholder='Username'
-						id='username'
-						onChange={handleChange}
-					/>
-					<input
-						type='email'
-						className='border-2 p-3 rounded-lg'
-						placeholder='Email'
-						id='email'
-						onChange={handleChange}
-					/>
-					<input
-						type='password'
-						className='border-2 p-3 rounded-lg'
-						placeholder='Password'
-						id='password'
-						onChange={handleChange}
-					/>
-					<input
-						type='password'
-						className='border-2 p-3 rounded-lg'
-						placeholder='Confirm Password'
-						id='confirmPassword'
-						onChange={handleChange}
-					/>
-					<div className=' border-2 p-2 flex flex-col'>
-						<p className=' text-center'>Select profile image</p>
-						<div className=''>
-							<input
-								type='file'
-								onChange={(e) => setFile(e.target.files[0])}
-								accept='image/*'
-								required
-							/>
-							<p>
-								{fileUploadError ? (
-									<span className=' text-red-700'>
-										Error uploading image(image must be less than 2 mb)
-									</span>
-								) : filePerc > 0 && filePerc < 100 ? (
-									<span>{`Uploading ${filePerc}%`}</span>
-								) : filePerc === 100 ? (
-									<span>Image successfully uploaded!</span>
-								) : (
-									""
-								)}
-							</p>
-						</div>
-						{file && (
-							<div className=' flex justify-between items-center'>
-								<img
-									src={formData.avatar}
-									alt={formData.username}
-									className='h-24 w-24 rounded-full object-contain self-center'
-								/>
-								<button
-									onClick={handleRemoveImage}
-									className=' text-red-700 p-3 rounded-lg uppercase'
-								>
-									Delete
-								</button>
-							</div>
-						)}
-					</div>
+			<form className='flex flex-col gap-3' onSubmit={handleSubmit(onSubmit)}>
+				<input
+					type='text'
+					id='username'
+					placeholder='Username'
+					{...register("username")}
+					onChange={handleChange}
+					className='p-4 border-2 rounded-lg w-full text-gray-700 focus:outline-none focus:border-indigo-500'
+				/>
+				<p className='text-red-600'>{errors.username?.message}</p>
 
-					<button
-						disabled={loading || uploading}
-						className=' bg-zinc-500 p-3 rounded-lg hover:opacity-90 disabled:opacity-80 text-white font-bold text-xl'
+				<input
+					type='email'
+					id='email'
+					placeholder='Email'
+					{...register("email")}
+					onChange={handleChange}
+					className='p-4 border-2 rounded-lg w-full text-gray-700 focus:outline-none focus:border-indigo-500'
+				/>
+				<p className='text-red-600'>{errors.email?.message}</p>
+
+				<div className='flex items-center border-2 rounded-lg p-4'>
+					<input
+						type={visible ? "text" : "password"}
+						placeholder='Password'
+						className='w-full border-none outline-none text-gray-700'
+						id='password'
+						{...register("password")}
+						onChange={handleChange}
+					/>
+					<div
+						onClick={() => setVisible(!visible)}
+						className='cursor-pointer text-gray-600'
 					>
-						{loading ? "Signing up..." : "Signup"}
-					</button>
-					{error && <p className=' text-red-700'>{error}</p>}
-					{message && <p className=' text-green-700'>{message}</p>}
-				</form>
-				<div className=' m-2'>
-					<p>
-						Already have an account?
-						<Link
-							className=' text-blue-600 px-2 hover:underline'
-							to={"/signin"}
-						>
-							Sign In
-						</Link>
-						Instead
-					</p>
+						{visible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+					</div>
 				</div>
+				<p className='text-red-600'>{errors.password?.message}</p>
+
+				<div className='flex items-center border-2 rounded-lg p-4'>
+					<input
+						type={visible ? "text" : "password"}
+						placeholder='Confirm Password'
+						className='w-full border-none outline-none text-gray-700'
+						id='confirmPassword'
+						{...register("confirmPassword")}
+						onChange={handleChange}
+					/>
+				</div>
+				<p className='text-red-600'>{errors.confirmPassword?.message}</p>
+
+				<div className='border-2 rounded-lg p-4 flex flex-col items-center'>
+					<p className='text-center text-gray-700 mb-2'>
+						Select a profile image
+					</p>
+					<input
+						type='file'
+						onChange={(e) => setFile(e.target.files[0])}
+						accept='image/*'
+						className='mb-3'
+					/>
+					<p className='text-sm text-gray-600'>
+						{fileUploadError ? (
+							<span className='text-red-600'>
+								Error uploading image. Image must be less than 2MB.
+							</span>
+						) : filePerc > 0 && filePerc < 100 ? (
+							<span>Uploading {filePerc}%</span>
+						) : filePerc === 100 ? (
+							<span className='text-green-600'>
+								Image successfully uploaded!
+							</span>
+						) : (
+							""
+						)}
+					</p>
+					{file && (
+						<div className='flex items-center gap-4'>
+							<img
+								src={formData.avatar}
+								alt='Profile'
+								className='h-24 w-24 rounded-full object-cover'
+							/>
+							<button
+								type='button'
+								onClick={handleRemoveImage}
+								className='text-red-600 font-semibold hover:underline'
+							>
+								Delete
+							</button>
+						</div>
+					)}
+				</div>
+
+				<button
+					disabled={uploading || loading || (file && filePerc < 100)}
+					className='w-full py-3 bg-zinc-500 text-white rounded-lg hover:bg-indigo-500 transition-opacity disabled:opacity-75'
+				>
+					{loading ? "Signing up..." : "Sign Up"}
+				</button>
+
+				<GoogleAuth />
+			</form>
+			{authError && (
+				<p className='text-red-600 mt-3 text-center'>{authError}</p>
+			)}
+			{authMessage && (
+				<p className='text-green-600 mt-3 text-center'>{authMessage}</p>
+			)}
+
+			<ForgotPassword />
+
+			<div className='flex justify-center mt-6 gap-2'>
+				<p className='text-gray-700'>Already have an account?</p>
+				<Link className='text-indigo-600 hover:underline' to='/signin'>
+					Signin
+				</Link>
 			</div>
 		</div>
 	);

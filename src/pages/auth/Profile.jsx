@@ -1,36 +1,63 @@
+/* eslint-disable no-unused-vars */
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-	clearError,
-	clearMessage,
-	signout,
-	updateUser,
-} from "../../redux/auth/authSlices";
 import {
 	getDownloadURL,
 	getStorage,
 	ref,
 	uploadBytesResumable,
 } from "firebase/storage";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import { useClearState } from "../../hooks/useClearState";
 import { app } from "../../firebase";
+import { toast } from "react-toastify";
+import { signout, updateUser } from "../../redux/auth/authSlices";
+import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import ConfirmationModal from "../../components/modal/Modal";
+
+const passwordRequirementsMessage =
+	"Password must contain at least 8 characters, including uppercase, lowercase, a number, and a special character.";
+
+const schema = yup.object().shape({
+	username: yup.string().required("Username is required"),
+	email: yup.string().email("Invalid email").required("Email is required"),
+	password: yup
+		.string()
+		.required(passwordRequirementsMessage)
+		.min(8, passwordRequirementsMessage)
+		.matches(/[A-Z]/, passwordRequirementsMessage)
+		.matches(/[a-z]/, passwordRequirementsMessage)
+		.matches(/[0-9]/, passwordRequirementsMessage)
+		.matches(/[!@#$%^&*(),.?":{}|<>]/, passwordRequirementsMessage),
+	confirmPassword: yup
+		.string()
+		.oneOf([yup.ref("password"), null], "Passwords must match")
+		.required("Confirm password is required"),
+});
 
 const Profile = () => {
-	const { currentUser, loading, message, error } = useSelector(
-		(state) => state.auth
-	);
+	const { currentUser, loading } = useSelector((state) => state.auth);
+
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	const fileRef = useRef();
-
 	const [formData, setFormData] = useState({});
 	const [file, setFile] = useState(null);
 	const [fileUploadError, setFileUploadError] = useState(false);
 	const [filePerc, setFilePerc] = useState(0);
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [showUpdateForm, setShowUpdateForm] = useState(false);
 
-	useClearState(dispatch, clearError, clearMessage);
+	const { avatar, username, email, id } = currentUser?.sanitizedUser || {};
+
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm({
+		resolver: yupResolver(schema),
+	});
 
 	useEffect(() => {
 		if (file) {
@@ -39,6 +66,12 @@ const Profile = () => {
 	}, [file]);
 
 	const handleUploadFile = (file) => {
+		if (file.size > 2 * 1024 * 1024) {
+			setFileUploadError(true);
+			toast.error("Image must be less than 2MB.");
+			return;
+		}
+
 		const storage = getStorage(app);
 		const fileName = new Date().getTime() + file.name;
 		const storageRef = ref(storage, fileName);
@@ -50,18 +83,25 @@ const Profile = () => {
 				const progress =
 					(snapshot.bytesTransferred / snapshot.totalBytes) * 100;
 				setFilePerc(Math.round(progress));
+				if (progress > 0 && progress < 100) {
+					toast.info(`Uploading ${Math.round(progress)}%`);
+				}
 			},
 			(error) => {
-				setFileUploadError(error);
+				setFileUploadError(true);
+				toast.error("Error during image upload. (Image must be less than 2MB)");
 			},
 			async () => {
 				const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
 				dispatch(
 					updateUser({
-						id: currentUser.sanitizedUser?.id,
+						id,
 						userData: { avatar: downloadURL },
 					})
 				);
+				toast.success("Profile Image Updated!");
+				setFile(null);
+				setFilePerc(0);
 			}
 		);
 	};
@@ -73,26 +113,26 @@ const Profile = () => {
 		});
 	};
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
+	const onSubmit = async (data) => {
 		try {
+			const isEmailUpdated = data.email && data.email !== email;
+
 			const res = await dispatch(
 				updateUser({
-					id: currentUser?.sanitizedUser?.id,
-					userData: formData,
+					id,
+					userData: data,
 				})
 			).unwrap();
 
 			if (res) {
-				toast.success("Your profile is updated.");
-				await dispatch(signout()).unwrap();
-				toast.info("You've been signed out. Please sign in again.");
+				setFormData({});
+
+				if (isEmailUpdated) {
+					await dispatch(signout()).unwrap();
+					navigate("/signin");
+				}
 			}
-			setFormData("");
-		} catch (err) {
-			toast.error("Error updating profile.");
-			console.error("Error updating: ", err);
-		}
+		} catch (err) {}
 	};
 
 	const handleSignout = async () => {
@@ -100,106 +140,160 @@ const Profile = () => {
 			const res = await dispatch(signout()).unwrap();
 
 			if (res) {
-				toast.success("Signed out.");
+				navigate("/signin");
 			}
 		} catch (err) {
 			console.error("Error signing out", err);
 		}
 	};
 
-	if (loading) return <p>Loading...</p>;
+	const toggleModal = () => {
+		setIsModalOpen((prev) => !prev);
+	};
+
+	const toggleUpdateForm = () => {
+		setShowUpdateForm((prev) => !prev);
+	};
+
+	if (loading)
+		return <div className='text-center text-xl py-10'>Loading...</div>;
 
 	return (
-		<div className=' max-w-2xl mx-auto p-2'>
-			<h1 className=' text-2xl font-bold m-3 text-center'>Profile</h1>
-			<div className=''>
-				<div className=' flex justify-center items-center'>
-					<img
-						src={currentUser?.sanitizedUser?.avatar}
-						alt='profile image'
-						className='rounded-full h-28 w-28 object-contain'
-					/>
-				</div>
-				<p>
-					Username:{" "}
-					<span className='font-bold'>
-						{currentUser?.sanitizedUser?.username}
-					</span>
-				</p>
-				<p>
-					Email:{" "}
-					<span className='font-bold'>{currentUser?.sanitizedUser?.email}</span>
-				</p>
-			</div>
-			<div className=' my-5'>
-				<h1 className=' font-bold text-center m-2'>Update Your Profile</h1>
-				<form onSubmit={handleSubmit} className='flex flex-col gap-3'>
-					<input
-						type='file'
-						accept='image/*'
-						ref={fileRef}
-						onChange={(e) => setFile(e.target.files[0])}
-						hidden
-					/>
-					<img
-						src={currentUser?.sanitizedUser?.avatar || "default-avatar.png"}
-						alt='profile image'
-						className=' rounded-full h-28 w-28 object-contain self-center cursor-pointer'
-						onClick={() => fileRef.current.click()}
-					/>
-					<p>
-						{fileUploadError ? (
-							<span className=' text-red-700'>
-								Error image upload (image must be less than 2 mb)
-							</span>
-						) : filePerc > 0 && filePerc < 100 ? (
-							<span className=' text-zinc-900'>{`Uploading ${filePerc}%`}</span>
-						) : filePerc === 100 ? (
-							<span className=' text-green-600'>Profile Image Updated!</span>
-						) : (
-							""
-						)}
-					</p>
-					<input
-						type='text'
-						className='border-2 rounded-lg p-3'
-						id='username'
-						onChange={handleChange}
-						defaultValue={
-							formData?.username || currentUser?.sanitizedUser?.username
-						}
-					/>
-					<input
-						type='email'
-						className='border-2 rounded-lg p-3'
-						id='email'
-						onChange={handleChange}
-						defaultValue={formData?.email || currentUser?.sanitizedUser?.email}
-					/>
-					<input
-						type='text'
-						className='border-2 rounded-lg p-3'
-						id='username'
-						onChange={handleChange}
-						placeholder='Your Password...'
-					/>
+		<div className='max-w-2xl mx-auto px-4 py-8'>
+			<h1 className='text-3xl font-bold mb-6 text-center'>Profile</h1>
+			{!showUpdateForm ? (
+				// Display Profile Information
+				<>
+					<div className='flex flex-col items-center gap-4'>
+						<div className='flex justify-center'>
+							<img
+								src={avatar}
+								className='h-28 w-28 rounded-full object-cover border-2 shadow-lg'
+								alt='profile picture'
+							/>
+						</div>
+						<p className='text-lg'>
+							Username:{" "}
+							<span className='font-semibold text-gray-700'>{username}</span>
+						</p>
+						<p className='text-lg'>
+							Email:{" "}
+							<span className='font-semibold text-gray-700'>{email}</span>
+						</p>
+					</div>
+					<hr className='my-6 border-gray-300' />
 					<button
-						disabled={loading}
-						className='bg-zinc-600 p-3 rounded-lg hover:opacity-90 disabled:opacity-80'
+						className='bg-zinc-500 text-white py-3 px-6 rounded-lg hover:opacity-90 transition-all'
+						onClick={toggleUpdateForm}
 					>
-						{loading ? "Updating..." : "Update"}
+						Update Profile
 					</button>
-				</form>
-				{error && <p className=' text-red-700'>{error}</p>}
-				{message && <p className=' text-green-600'>{message}</p>}
-			</div>
-			<div className=' flex justify-end my-2'>
+				</>
+			) : (
+				// Display Update Form when toggled
+				<div className='my-8'>
+					<h2 className='text-2xl font-semibold mb-4 text-center'>
+						Update Profile
+					</h2>
+					<form
+						className='flex flex-col gap-3'
+						onSubmit={handleSubmit(onSubmit)}
+					>
+						<div className='flex justify-center'>
+							<input
+								type='file'
+								accept='image/*'
+								ref={fileRef}
+								onChange={(e) => setFile(e.target.files[0])}
+								hidden
+							/>
+							<img
+								src={formData.avatar || avatar}
+								className='h-28 w-28 rounded-full object-cover border-2 border-gray-300 shadow-lg cursor-pointer'
+								alt='profile update picture'
+								onClick={() => fileRef.current.click()}
+							/>
+						</div>
+						{fileUploadError && (
+							<p className='text-red-600'>Image must be less than 2MB.</p>
+						)}
+
+						<input
+							type='text'
+							id='username'
+							defaultValue={formData.username || username}
+							className='border-2 border-gray-300 rounded-lg p-3 w-full text-gray-700 focus:border-indigo-500 focus:outline-none'
+							placeholder='Update Username'
+							onChange={handleChange}
+							{...register("username")}
+						/>
+						<p className='text-red-600'>{errors.username?.message}</p>
+
+						<input
+							type='email'
+							id='email'
+							defaultValue={formData.email || email}
+							className='border-2 border-gray-300 rounded-lg p-3 w-full text-gray-700 focus:border-indigo-500 focus:outline-none'
+							placeholder='Update Email'
+							onChange={handleChange}
+							{...register("email")}
+						/>
+						<p className='text-red-600'>{errors.email?.message}</p>
+
+						<input
+							type='password'
+							id='password'
+							placeholder='Update Password'
+							className='border-2 border-gray-300 rounded-lg p-3 w-full text-gray-700 focus:border-indigo-500 focus:outline-none'
+							onChange={handleChange}
+							{...register("password")}
+						/>
+						<p className='text-red-600'>{errors.password?.message}</p>
+
+						<input
+							type='password'
+							id='confirmPassword'
+							placeholder='Confirm Password'
+							className='border-2 border-gray-300 rounded-lg p-3 w-full text-gray-700 focus:border-indigo-500 focus:outline-none'
+							{...register("confirmPassword")}
+						/>
+						<p className='text-red-600'>{errors.confirmPassword?.message}</p>
+
+						<div className='flex justify-between'>
+							<button
+								className='bg-zinc-700 text-white py-3 px-6 rounded-lg hover:bg-zinc-600 transition-all disabled:opacity-80'
+								disabled={loading}
+							>
+								{loading ? "Updating..." : "Update"}
+							</button>
+							<button
+								type='button'
+								className='bg-red-600 text-white py-3 px-6 rounded-lg hover:bg-red-500 transition-all'
+								onClick={toggleUpdateForm}
+							>
+								Cancel
+							</button>
+						</div>
+					</form>
+				</div>
+			)}
+			<div className='flex justify-end'>
 				<button
-					className=' bg-red-700 hover:opacity-90 rounded-lg text-white p-3'
-					onClick={handleSignout}
+					onClick={toggleModal}
+					className='bg-red-700 text-white py-3 px-6 rounded-lg hover:bg-red-500 transition-all disabled:opacity-80'
 				>
 					Signout
 				</button>
+				<ConfirmationModal
+					isOpen={isModalOpen}
+					title='Confirm Signout'
+					message='Are you sure you want to signout?'
+					onClose={toggleModal}
+					onConfirm={() => {
+						toggleModal();
+						handleSignout();
+					}}
+				/>
 			</div>
 		</div>
 	);

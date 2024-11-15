@@ -1,17 +1,22 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { clearError, clearMessage, signin } from "../../redux/auth/authSlices";
-import { useClearState } from "../../hooks/useClearState";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { signin } from "../../redux/auth/authSlices";
+import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
+import GoogleAuth from "../../components/googleAuth/GoogleAuth";
+import ForgotPassword from "../../components/forgotPassword/ForgotPassword";
 
 const Signin = () => {
-	const { loading, message, error } = useSelector((state) => state.auth);
+	const {
+		loading,
+		message: authMessage,
+		error: authError,
+	} = useSelector((state) => state.auth);
 	const [formData, setFormData] = useState("");
+	const [visible, setVisible] = useState(false);
+
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
-
-	useClearState(dispatch, clearError, clearMessage);
 
 	const handleChange = (e) => {
 		setFormData({
@@ -22,22 +27,21 @@ const Signin = () => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		try {
-			const res = await dispatch(signin(formData)).unwrap();
-			if (res) {
-				navigate("/profile");
-			}
-			setFormData("");
-		} catch (err) {
-			toast.error("Error signing in.");
+		const res = await dispatch(signin(formData)).unwrap();
+
+		if (res) {
+			navigate("/profile");
 		}
 	};
 
-	if (loading) return <div className=''>Loading...</div>;
+	if (loading)
+		return <div className='text-center text-xl py-10'>Loading...</div>;
 
 	return (
 		<div className=' max-w-2xl mx-auto p-2'>
-			<h1 className=' text-2xl font-bold m-3 text-center'>Signin</h1>
+			<h1 className='text-3xl font-bold text-center text-gray-800 mb-6'>
+				Sign In
+			</h1>
 			<div className=''>
 				<form className=' flex flex-col gap-3' onSubmit={handleSubmit}>
 					<input
@@ -60,9 +64,17 @@ const Signin = () => {
 					>
 						{loading ? "Signing In..." : "Signin"}
 					</button>
+					<GoogleAuth />
 				</form>
-				{error && <p className=' text-red-700'>{error}</p>}
-				{message && <p className=' text-green-700'>{message}</p>}
+
+				{authError && (
+					<p className='text-red-600 mt-3 text-center'>{authError}</p>
+				)}
+				{authMessage && (
+					<p className='text-green-600 mt-3 text-center'>{authMessage}</p>
+				)}
+
+				<ForgotPassword />
 			</div>
 			<div className=' m-2'>
 				<p>
