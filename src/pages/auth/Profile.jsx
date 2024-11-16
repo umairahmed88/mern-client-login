@@ -20,20 +20,34 @@ const passwordRequirementsMessage =
 	"Password must contain at least 8 characters, including uppercase, lowercase, a number, and a special character.";
 
 const schema = yup.object().shape({
-	username: yup.string().required("Username is required"),
-	email: yup.string().email("Invalid email").required("Email is required"),
+	username: yup.string().optional(),
+	email: yup.string().email("Invalid email").optional(),
 	password: yup
 		.string()
-		.required(passwordRequirementsMessage)
-		.min(8, passwordRequirementsMessage)
-		.matches(/[A-Z]/, passwordRequirementsMessage)
-		.matches(/[a-z]/, passwordRequirementsMessage)
-		.matches(/[0-9]/, passwordRequirementsMessage)
-		.matches(/[!@#$%^&*(),.?":{}|<>]/, passwordRequirementsMessage),
+		.test("is-password-valid", passwordRequirementsMessage, (value) => {
+			if (!value) return true;
+			return (
+				value.length >= 8 &&
+				/[A-Z]/.test(value) &&
+				/[a-z]/.test(value) &&
+				/[0-9]/.test(value) &&
+				/[!@#$%^&*(),.?":{}|<>]/.test(value)
+			);
+		}),
 	confirmPassword: yup
 		.string()
-		.oneOf([yup.ref("password"), null], "Passwords must match")
-		.required("Confirm password is required"),
+		.test(
+			"is-confirm-password-valid",
+			"Passwords must match",
+			(value, context) => {
+				// Only enforce validation if the password is present
+				if (context.parent.password && value !== context.parent.password) {
+					return false;
+				}
+				return true;
+			}
+		)
+		.optional(),
 });
 
 const Profile = () => {
@@ -159,7 +173,7 @@ const Profile = () => {
 		return <div className='text-center text-xl py-10'>Loading...</div>;
 
 	return (
-		<div className='max-w-2xl mx-auto px-4 py-8'>
+		<div className=' max-w-lg mx-auto border border-t-0 shadow-md p-6 mt-12 rounded-lg'>
 			<h1 className='text-3xl font-bold mb-6 text-center'>Profile</h1>
 			{!showUpdateForm ? (
 				// Display Profile Information
@@ -168,25 +182,25 @@ const Profile = () => {
 						<div className='flex justify-center'>
 							<img
 								src={avatar}
-								className='h-28 w-28 rounded-full object-cover border-2 shadow-lg'
+								className='h-28 w-28 rounded-3xl object-cover border-2 shadow-lg'
 								alt='profile picture'
 							/>
 						</div>
-						<p className='text-lg'>
+						<p className='text-lg text-left w-full pl-6'>
 							Username:{" "}
 							<span className='font-semibold text-gray-700'>{username}</span>
 						</p>
-						<p className='text-lg'>
+						<p className='text-lg text-left w-full pl-6'>
 							Email:{" "}
 							<span className='font-semibold text-gray-700'>{email}</span>
 						</p>
 					</div>
-					<hr className='my-6 border-gray-300' />
+					{/* <hr className='my-6 border-gray-300' /> */}
 					<button
-						className='bg-zinc-800 text-white py-3 px-6 rounded-lg hover:bg-zinc-700 transition-all'
+						className='bg-zinc-800 my-6 text-white py-3 px-6 rounded-lg hover:bg-zinc-700 transition-all'
 						onClick={toggleUpdateForm}
 					>
-						Update Profile
+						Update
 					</button>
 				</>
 			) : (

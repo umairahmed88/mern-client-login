@@ -140,7 +140,7 @@ const Signup = () => {
 	};
 
 	return (
-		<div className=' max-w-2xl mx-auto'>
+		<div className=' max-w-lg mx-auto border border-t-0 shadow-md p-6 mt-12 rounded-lg'>
 			<h1 className=' text-2xl font-bold m-3 text-center'>Signup</h1>
 			<form className='flex flex-col gap-3' onSubmit={handleSubmit(onSubmit)}>
 				<input
@@ -149,7 +149,7 @@ const Signup = () => {
 					placeholder='Username'
 					{...register("username")}
 					onChange={handleChange}
-					className='p-4 border-2 rounded-lg w-full text-gray-700 focus:outline-none focus:border-zinc-400'
+					className='p-3 border-2 rounded-lg w-full border-zinc-300 text-gray-700 focus:outline-none focus:border-zinc-400'
 				/>
 				<p className='text-red-700'>{errors.username?.message}</p>
 
@@ -159,11 +159,11 @@ const Signup = () => {
 					placeholder='Email'
 					{...register("email")}
 					onChange={handleChange}
-					className='p-4 border-2 rounded-lg w-full text-gray-700 focus:outline-none focus:border-zinc-400'
+					className='p-3 border-2 rounded-lg w-full text-gray-700 border-zinc-300 focus:outline-none focus:border-zinc-400'
 				/>
 				<p className='text-red-700'>{errors.email?.message}</p>
 
-				<div className='flex items-center border-2 rounded-lg p-4 focus-within:outline-none focus-within:border-zinc-400'>
+				<div className='flex items-center border-2 border-zinc-300 rounded-lg p-3 focus-within:outline-none focus-within:border-zinc-400'>
 					<input
 						type={visible ? "text" : "password"}
 						placeholder='Password'
@@ -181,7 +181,7 @@ const Signup = () => {
 				</div>
 				<p className='text-red-700'>{errors.password?.message}</p>
 
-				<div className='flex items-center border-2 rounded-lg p-4 focus-within:outline-none focus-within:border-zinc-400'>
+				<div className='flex items-center border-2 border-zinc-300 rounded-lg p-3 focus-within:outline-none focus-within:border-zinc-400'>
 					<input
 						type={visible ? "text" : "password"}
 						placeholder='Confirm Password'
@@ -193,7 +193,7 @@ const Signup = () => {
 				</div>
 				<p className='text-red-700'>{errors.confirmPassword?.message}</p>
 
-				<div className='border-2 rounded-lg p-4 flex flex-col items-center'>
+				<div className='border-2 rounded-lg p-4 flex flex-col border-zinc-300 items-start'>
 					<p className='text-center text-gray-700 mb-2'>
 						Select a profile image
 					</p>
@@ -254,11 +254,14 @@ const Signup = () => {
 
 			<ForgotPassword />
 
-			<div className='flex justify-center mt-6 gap-2'>
-				<p className='text-gray-700'>Already have an account?</p>
-				<Link className='text-indigo-600 hover:underline' to='/signin'>
-					Signin
-				</Link>
+			<div className='flex justify-start mt-6 gap-2'>
+				<p className='text-gray-700'>
+					Already have an account?
+					<Link className='text-indigo-600 hover:underline px-2' to='/signin'>
+						Signin
+					</Link>
+					Instead.
+				</p>
 			</div>
 		</div>
 	);
