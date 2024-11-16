@@ -48,19 +48,19 @@ const Signin = () => {
 						type='email'
 						id='email'
 						placeholder='Email'
-						className='p-3 rounded-lg border-2'
+						className='p-3 rounded-lg border-2 border-zinc-300'
 						onChange={handleChange}
 					/>
 					<input
 						type='password'
 						id='password'
 						placeholder='Password'
-						className='p-3 rounded-lg border-2'
+						className='p-3 rounded-lg border-2 border-zinc-300'
 						onChange={handleChange}
 					/>
 					<button
 						disabled={loading}
-						className='bg-zinc-500 p-3 rounded-lg font-bold text-white hover:opacity-90 disabled:opacity-80'
+						className='bg-zinc-800 p-3 rounded-lg font-bold text-white hover:bg-zinc-700 disabled:opacity-80'
 					>
 						{loading ? "Signing In..." : "Signin"}
 					</button>
@@ -68,10 +68,10 @@ const Signin = () => {
 				</form>
 
 				{authError && (
-					<p className='text-red-600 mt-3 text-center'>{authError}</p>
+					<p className='text-red-700 mt-3 text-center'>{authError}</p>
 				)}
 				{authMessage && (
-					<p className='text-green-600 mt-3 text-center'>{authMessage}</p>
+					<p className='text-green-700 mt-3 text-center'>{authMessage}</p>
 				)}
 
 				<ForgotPassword />
@@ -79,7 +79,7 @@ const Signin = () => {
 			<div className=' m-2'>
 				<p>
 					Do not have an account?
-					<Link className=' text-blue-600 px-2 hover:underline' to={"/signup"}>
+					<Link className=' text-blue-700 px-2 hover:underline' to={"/signup"}>
 						Sign Up
 					</Link>
 					first.

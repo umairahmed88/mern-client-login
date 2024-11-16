@@ -49,9 +49,9 @@ const ForgotPassword = () => {
 
 			{isOpen && (
 				<div className='fixed inset-0 flex justify-center items-center z-50'>
-					<div className='absolute inset-0 bg-gray-600 bg-opacity-50'></div>
+					<div className='absolute inset-0 bg-gray-800 bg-opacity-30'></div>
 					<div className='relative bg-white p-6 rounded-xl shadow-md max-w-md mx-auto z-10 space-y-4'>
-						<h2 className='text-xl font-semibold text-gray-700'>
+						<h2 className='text-xl font-semibold text-gray-800'>
 							Forgot Password
 						</h2>
 						<form onSubmit={handleSubmit}>
@@ -79,7 +79,7 @@ const ForgotPassword = () => {
 								className={`w-full text-white py-2 px-4 rounded-md ${
 									loading
 										? "bg-gray-400 cursor-not-allowed"
-										: "bg-zinc-700 hover:bg-zinc-600"
+										: "bg-zinc-800 hover:bg-zinc-700"
 								}`}
 							>
 								{loading ? "Sending..." : "Send Reset Password"}
@@ -87,14 +87,14 @@ const ForgotPassword = () => {
 						</form>
 
 						{message && (
-							<p className='mt-4 text-green-600 text-sm'>{message}</p>
+							<p className='mt-4 text-green-700 text-sm'>{message}</p>
 						)}
-						{error && <p className='mt-4 text-red-600 text-sm'>{error}</p>}
+						{error && <p className='mt-4 text-red-700 text-sm'>{error}</p>}
 
 						<div className='flex justify-end mt-4'>
 							<button
 								onClick={toggleModal}
-								className='text-sm text-gray-500 hover:underline'
+								className='text-sm text-gray-700 hover:underline'
 							>
 								Close
 							</button>

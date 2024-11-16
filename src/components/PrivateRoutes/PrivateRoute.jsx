@@ -4,10 +4,10 @@ import { jwtDecode } from "jwt-decode";
 import { useEffect, useState } from "react";
 import { signout } from "../../redux/auth/authSlices";
 
-function PrivateRoute() {
+const PrivateRoute = () => {
 	const { currentUser } = useSelector((state) => state.auth);
 	const dispatch = useDispatch();
-	const [isTokenValid, setIsTokenValid] = useState(true); // State to manage token validity
+	const [isTokenValid, setIsTokenValid] = useState(true);
 
 	useEffect(() => {
 		if (currentUser && currentUser?.sanitizedUser?.token) {
@@ -30,26 +30,6 @@ function PrivateRoute() {
 	}
 
 	return <Outlet />;
-}
+};
 
-function UserRoute() {
-	const { currentUser } = useSelector((state) => state.auth);
-
-	if (currentUser?.sanitizedUser?.role !== "user") {
-		return <Navigate to='/forbidden' />;
-	}
-
-	return <PrivateRoute />;
-}
-
-function AdminRoute() {
-	const { currentUser } = useSelector((state) => state.auth);
-
-	if (currentUser?.sanitizedUser?.role !== "admin") {
-		return <Navigate to='/forbidden' />;
-	}
-
-	return <PrivateRoute />;
-}
-
-export { PrivateRoute, UserRoute, AdminRoute };
+export default PrivateRoute;

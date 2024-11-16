@@ -149,9 +149,9 @@ const Signup = () => {
 					placeholder='Username'
 					{...register("username")}
 					onChange={handleChange}
-					className='p-4 border-2 rounded-lg w-full text-gray-700 focus:outline-none focus:border-indigo-500'
+					className='p-4 border-2 rounded-lg w-full text-gray-700 focus:outline-none focus:border-zinc-400'
 				/>
-				<p className='text-red-600'>{errors.username?.message}</p>
+				<p className='text-red-700'>{errors.username?.message}</p>
 
 				<input
 					type='email'
@@ -159,11 +159,11 @@ const Signup = () => {
 					placeholder='Email'
 					{...register("email")}
 					onChange={handleChange}
-					className='p-4 border-2 rounded-lg w-full text-gray-700 focus:outline-none focus:border-indigo-500'
+					className='p-4 border-2 rounded-lg w-full text-gray-700 focus:outline-none focus:border-zinc-400'
 				/>
-				<p className='text-red-600'>{errors.email?.message}</p>
+				<p className='text-red-700'>{errors.email?.message}</p>
 
-				<div className='flex items-center border-2 rounded-lg p-4'>
+				<div className='flex items-center border-2 rounded-lg p-4 focus-within:outline-none focus-within:border-zinc-400'>
 					<input
 						type={visible ? "text" : "password"}
 						placeholder='Password'
@@ -179,9 +179,9 @@ const Signup = () => {
 						{visible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
 					</div>
 				</div>
-				<p className='text-red-600'>{errors.password?.message}</p>
+				<p className='text-red-700'>{errors.password?.message}</p>
 
-				<div className='flex items-center border-2 rounded-lg p-4'>
+				<div className='flex items-center border-2 rounded-lg p-4 focus-within:outline-none focus-within:border-zinc-400'>
 					<input
 						type={visible ? "text" : "password"}
 						placeholder='Confirm Password'
@@ -191,7 +191,7 @@ const Signup = () => {
 						onChange={handleChange}
 					/>
 				</div>
-				<p className='text-red-600'>{errors.confirmPassword?.message}</p>
+				<p className='text-red-700'>{errors.confirmPassword?.message}</p>
 
 				<div className='border-2 rounded-lg p-4 flex flex-col items-center'>
 					<p className='text-center text-gray-700 mb-2'>
@@ -205,7 +205,7 @@ const Signup = () => {
 					/>
 					<p className='text-sm text-gray-600'>
 						{fileUploadError ? (
-							<span className='text-red-600'>
+							<span className='text-red-700'>
 								Error uploading image. Image must be less than 2MB.
 							</span>
 						) : filePerc > 0 && filePerc < 100 ? (
@@ -228,7 +228,7 @@ const Signup = () => {
 							<button
 								type='button'
 								onClick={handleRemoveImage}
-								className='text-red-600 font-semibold hover:underline'
+								className='text-red-700 font-semibold hover:underline'
 							>
 								Delete
 							</button>
@@ -238,7 +238,7 @@ const Signup = () => {
 
 				<button
 					disabled={uploading || loading || (file && filePerc < 100)}
-					className='w-full py-3 bg-zinc-600 text-white rounded-lg hover:bg-zinc-500 transition-opacity disabled:opacity-75'
+					className='w-full py-3 bg-zinc-800 text-white rounded-lg hover:bg-zinc-700 transition-opacity disabled:opacity-75'
 				>
 					{loading ? "Signing up..." : "Sign Up"}
 				</button>
@@ -246,7 +246,7 @@ const Signup = () => {
 				<GoogleAuth />
 			</form>
 			{authError && (
-				<p className='text-red-600 mt-3 text-center'>{authError}</p>
+				<p className='text-red-700 mt-3 text-center'>{authError}</p>
 			)}
 			{authMessage && (
 				<p className='text-green-600 mt-3 text-center'>{authMessage}</p>

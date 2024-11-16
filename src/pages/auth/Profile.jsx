@@ -183,7 +183,7 @@ const Profile = () => {
 					</div>
 					<hr className='my-6 border-gray-300' />
 					<button
-						className='bg-zinc-500 text-white py-3 px-6 rounded-lg hover:opacity-90 transition-all'
+						className='bg-zinc-800 text-white py-3 px-6 rounded-lg hover:bg-zinc-700 transition-all'
 						onClick={toggleUpdateForm}
 					>
 						Update Profile
@@ -261,14 +261,14 @@ const Profile = () => {
 
 						<div className='flex justify-between'>
 							<button
-								className='bg-zinc-700 text-white py-3 px-6 rounded-lg hover:bg-zinc-600 transition-all disabled:opacity-80'
+								className='bg-zinc-800 text-white py-3 px-6 rounded-lg hover:bg-zinc-600 transition-all disabled:opacity-80'
 								disabled={loading}
 							>
 								{loading ? "Updating..." : "Update"}
 							</button>
 							<button
 								type='button'
-								className='bg-red-600 text-white py-3 px-6 rounded-lg hover:bg-red-500 transition-all'
+								className='bg-red-700 text-white py-3 px-6 rounded-lg hover:bg-red-500 transition-all'
 								onClick={toggleUpdateForm}
 							>
 								Cancel
@@ -280,7 +280,7 @@ const Profile = () => {
 			<div className='flex justify-end'>
 				<button
 					onClick={toggleModal}
-					className='bg-red-700 text-white py-3 px-6 rounded-lg hover:bg-red-500 transition-all disabled:opacity-80'
+					className='bg-red-800 text-white py-3 px-6 rounded-lg hover:bg-red-500 transition-all disabled:opacity-80'
 				>
 					Signout
 				</button>
