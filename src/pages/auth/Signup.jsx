@@ -12,30 +12,21 @@ import {
 	uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "../../firebase";
+import GoogleAuth from "../../components/googleAuth/GoogleAuth";
+import ForgotPassword from "../../components/forgotPassword/ForgotPassword";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import GoogleAuth from "../../components/googleAuth/GoogleAuth";
-import ForgotPassword from "../../components/forgotPassword/ForgotPassword";
-
-const passwordRequirementsMessage =
-	"Password is required and it must contain at least 8 characters, an uppercase letter, a lowercase letter, and a number";
+import {
+	confirmPasswordValidator,
+	passwordValidator,
+} from "../../hooks/PasswordValidators/PasswordValidators";
 
 const schema = yup.object().shape({
 	username: yup.string().required("Username is required"),
 	email: yup.string().email("Invalid email").required("Email is required"),
-	password: yup
-		.string()
-		.required(passwordRequirementsMessage)
-		.min(8, passwordRequirementsMessage)
-		.matches(/[A-Z]/, passwordRequirementsMessage)
-		.matches(/[a-z]/, passwordRequirementsMessage)
-		.matches(/[0-9]/, passwordRequirementsMessage)
-		.matches(/[!@#$%^&*(),.?":{}|<>]/, passwordRequirementsMessage),
-	confirmPassword: yup
-		.string()
-		.oneOf([yup.ref("password"), null], "Passwords must match")
-		.required("Confirm password is required"),
+	password: passwordValidator,
+	confirmPassword: confirmPasswordValidator("password"),
 });
 
 const Signup = () => {

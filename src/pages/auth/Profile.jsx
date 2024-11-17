@@ -15,39 +15,16 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import ConfirmationModal from "../../components/modal/Modal";
-
-const passwordRequirementsMessage =
-	"Password must contain at least 8 characters, including uppercase, lowercase, a number, and a special character.";
+import {
+	confirmPasswordValidator,
+	passwordValidator,
+} from "../../hooks/PasswordValidators/PasswordValidators";
 
 const schema = yup.object().shape({
 	username: yup.string().optional(),
 	email: yup.string().email("Invalid email").optional(),
-	password: yup
-		.string()
-		.test("is-password-valid", passwordRequirementsMessage, (value) => {
-			if (!value) return true;
-			return (
-				value.length >= 8 &&
-				/[A-Z]/.test(value) &&
-				/[a-z]/.test(value) &&
-				/[0-9]/.test(value) &&
-				/[!@#$%^&*(),.?":{}|<>]/.test(value)
-			);
-		}),
-	confirmPassword: yup
-		.string()
-		.test(
-			"is-confirm-password-valid",
-			"Passwords must match",
-			(value, context) => {
-				// Only enforce validation if the password is present
-				if (context.parent.password && value !== context.parent.password) {
-					return false;
-				}
-				return true;
-			}
-		)
-		.optional(),
+	password: passwordValidator.optional(),
+	confirmPassword: confirmPasswordValidator("password").optional(),
 });
 
 const Profile = () => {

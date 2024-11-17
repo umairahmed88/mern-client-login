@@ -3,6 +3,18 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { resetPassword } from "../../redux/auth/authSlices";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import {
+	confirmPasswordValidator,
+	passwordValidator,
+} from "../../hooks/PasswordValidators/PasswordValidators";
+
+const schema = yup.object().shape({
+	password: passwordValidator,
+	confirmPassword: confirmPasswordValidator("password"),
+});
 
 const ResetPassword = () => {
 	const { message: authMessage, error: authError } = useSelector(
@@ -18,9 +30,15 @@ const ResetPassword = () => {
 	const query = new URLSearchParams(useLocation().search);
 	const token = query.get("token");
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm({
+		resolver: yupResolver(schema),
+	});
 
+	const onSubmit = async (data) => {
 		if (newPassword !== confirmNewPassword) {
 			return;
 		}
@@ -28,7 +46,11 @@ const ResetPassword = () => {
 		try {
 			setLoading(true);
 			const res = await dispatch(
-				resetPassword({ token, newPassword, confirmNewPassword })
+				resetPassword({
+					token,
+					newPassword: data.newPassword,
+					confirmNewPassword,
+				})
 			).unwrap();
 
 			navigate("/signin");
@@ -46,7 +68,7 @@ const ResetPassword = () => {
 					Reset Password
 				</h2>
 
-				<form onSubmit={handleSubmit} className='mt-6'>
+				<form onSubmit={handleSubmit(onSubmit)} className='mt-6'>
 					<div className='mb-4'>
 						<label
 							htmlFor='new-password'
@@ -57,10 +79,10 @@ const ResetPassword = () => {
 						<input
 							type='password'
 							id='new-password'
-							value={newPassword}
-							onChange={(e) => setNewPassword(e.target.value)}
-							className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
-							required
+							{...register("password")}
+							className={`mt-1 block w-full px-3 py-2 border ${
+								errors.password ? "border-red-500" : "border-gray-300"
+							} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
 							placeholder='Enter new password'
 						/>
 					</div>
@@ -75,10 +97,10 @@ const ResetPassword = () => {
 						<input
 							type='password'
 							id='confirm-new-password'
-							value={confirmNewPassword}
-							onChange={(e) => setConfirmNewPassword(e.target.value)}
-							className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
-							required
+							{...register("confirmPassword")}
+							className={`mt-1 block w-full px-3 py-2 border ${
+								errors.confirmPassword ? "border-red-500" : "border-gray-300"
+							} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
 							placeholder='Confirm new password'
 						/>
 					</div>
