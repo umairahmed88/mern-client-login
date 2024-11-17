@@ -219,20 +219,6 @@ const authSlice = createSlice({
 					action.payload?.message ||
 					"An error occurred while reset the password";
 			})
-			.addCase(googleAuth.pending, (state) => {
-				state.loading = true;
-				state.message = null;
-				state.error = null;
-			})
-			.addCase(googleAuth.fulfilled, (state, action) => {
-				state.loading = false;
-				state.currentUser = action.payload || action.payload.auth;
-				state.message = action.payload.message;
-			})
-			.addCase(googleAuth.rejected, (state, action) => {
-				state.loading = false;
-				state.error = action.payload?.message;
-			})
 			.addCase(resetPassword.pending, (state) => {
 				state.loading = true;
 				state.message = null;
@@ -248,6 +234,20 @@ const authSlice = createSlice({
 					action.payload?.message ||
 					"An error occurred while resetting the password";
 			})
+			.addCase(googleAuth.pending, (state) => {
+				state.loading = true;
+				state.message = null;
+				state.error = null;
+			})
+			.addCase(googleAuth.fulfilled, (state, action) => {
+				state.loading = false;
+				state.currentUser = action.payload || action.payload.auth;
+				state.message = action.payload.message;
+			})
+			.addCase(googleAuth.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload?.message;
+			})
 			.addCase(updateUser.pending, (state) => {
 				state.loading = true;
 				state.error = null;
@@ -259,7 +259,8 @@ const authSlice = createSlice({
 			})
 			.addCase(updateUser.rejected, (state, action) => {
 				state.loading = false;
-				state.error = action.payload.message;
+				state.error =
+					action.payload?.message || "An error occurred while updating";
 			})
 			.addCase(signout.pending, (state) => {
 				state.loading = true;
@@ -269,7 +270,7 @@ const authSlice = createSlice({
 			.addCase(signout.fulfilled, (state, action) => {
 				state.loading = false;
 				state.currentUser = null;
-				state.message = action.payload.message || action.payload;
+				state.message = action.payload.message;
 			})
 			.addCase(signout.rejected, (state, action) => {
 				state.loading = false;
