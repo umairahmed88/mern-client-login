@@ -1,21 +1,19 @@
 /* eslint-disable no-unused-vars */
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-	clearError,
-	clearMessage,
-	forgotPassword,
-} from "../../redux/auth/authSlices";
+import { forgotPassword } from "../../redux/auth/authSlices";
 import { toast } from "react-toastify";
-import { useClearState } from "../../hooks/useClearState";
 
 const ForgotPassword = () => {
 	const [email, setEmail] = useState("");
 	const dispatch = useDispatch();
-	const { loading, message, error } = useSelector((state) => state.auth);
-	const [isOpen, setIsOpen] = useState(false);
+	const {
+		loading,
+		message: authMessage,
+		error: authError,
+	} = useSelector((state) => state.auth);
 
-	useClearState(dispatch, clearMessage, clearError, error, message);
+	const [isOpen, setIsOpen] = useState(false);
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -86,10 +84,12 @@ const ForgotPassword = () => {
 							</button>
 						</form>
 
-						{message && (
-							<p className='mt-4 text-green-700 text-sm'>{message}</p>
+						{authMessage && (
+							<p className='mt-4 text-green-700 text-sm'>{authMessage}</p>
 						)}
-						{error && <p className='mt-4 text-red-700 text-sm'>{error}</p>}
+						{authError && (
+							<p className='mt-4 text-red-700 text-sm'>{authError}</p>
+						)}
 
 						<div className='flex justify-end mt-4'>
 							<button
