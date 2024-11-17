@@ -17,12 +17,11 @@ const VerifyEmail = () => {
 
 				if (response.data.message === "Email already verified") {
 					toast.info("Your email is already verified. Please sign in.");
-					// navigate("/signin");
+					navigate("/signin");
 				} else {
 					toast.success("Email verification successful.");
+					navigate("/signin");
 				}
-
-				// navigate("/signin");
 			} catch (error) {
 				if (error.response) {
 					toast.error(`Error verifying email: ${error.response.data.message}`);
