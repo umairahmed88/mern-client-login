@@ -69,10 +69,6 @@ const Signup = () => {
 		}
 	}, [file]);
 
-	useEffect(() => {
-		console.log("formData:", formData);
-	}, [formData]);
-
 	const handleUploadFile = (file) => {
 		if (file.size > 2 * 1024 * 1024) {
 			setFileUploadError(true);
