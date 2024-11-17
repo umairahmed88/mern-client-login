@@ -7,6 +7,7 @@ import {
 	Signup,
 	VerifyEmail,
 	Profile,
+	ResetPassword,
 	PrivateRoute,
 } from "../imports/imports";
 
@@ -16,9 +17,10 @@ const AppRoutes = () => (
 		<Route path='/signup' element={<Signup />} />
 		<Route path='/signin' element={<Signin />} />
 		<Route path='/verify-email' element={<VerifyEmail />} />
-		{/* <Route element={<PrivateRoute />}> */}
-		<Route path='/profile' element={<Profile />} />
-		{/* </Route> */}
+		<Route path='/reset-password' element={<ResetPassword />} />
+		<Route element={<PrivateRoute />}>
+			<Route path='/profile' element={<Profile />} />
+		</Route>
 	</Routes>
 );
 
