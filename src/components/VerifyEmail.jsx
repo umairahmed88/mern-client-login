@@ -12,7 +12,7 @@ const VerifyEmail = () => {
 		const verifyEmail = async () => {
 			try {
 				const response = await axios.get(
-					`https://ua-mern-api.vercel.app/api/v1/auth/verify-email?token=${token}`
+					`https://ua-mern-api-login.vercel.app/api/v1/auth/verify-email?token=${token}`
 				);
 
 				if (response.data.message === "Email already verified") {
