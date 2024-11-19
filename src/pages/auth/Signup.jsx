@@ -14,20 +14,7 @@ import {
 import { app } from "../../firebase";
 import GoogleAuth from "../../components/googleAuth/GoogleAuth";
 import ForgotPassword from "../../components/forgotPassword/ForgotPassword";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import {
-	confirmPasswordValidator,
-	passwordValidator,
-} from "../../hooks/PasswordValidators/PasswordValidators";
-
-const schema = yup.object().shape({
-	username: yup.string().required("Username is required"),
-	email: yup.string().email("Invalid email").required("Email is required"),
-	password: passwordValidator,
-	confirmPassword: confirmPasswordValidator("password"),
-});
+import { useFormSetup } from "../../hooks/useFormSetup/useFormSetup";
 
 const Signup = () => {
 	const {
@@ -48,11 +35,8 @@ const Signup = () => {
 	const {
 		register,
 		handleSubmit,
-		setValue,
 		formState: { errors },
-	} = useForm({
-		resolver: yupResolver(schema),
-	});
+	} = useFormSetup("signup");
 
 	useEffect(() => {
 		if (file) {
@@ -95,13 +79,6 @@ const Signup = () => {
 		);
 	};
 
-	const handleChange = (e) => {
-		setFormData({
-			...formData,
-			[e.target.id]: e.target.value,
-		});
-	};
-
 	const onSubmit = async (data) => {
 		const completeData = { ...data, ...formData };
 		try {
@@ -135,7 +112,6 @@ const Signup = () => {
 					id='username'
 					placeholder='Username'
 					{...register("username")}
-					onChange={handleChange}
 					className='p-3 border-2 rounded-lg w-full border-zinc-300 text-gray-700 focus:outline-none focus:border-zinc-400'
 				/>
 				<p className='text-red-700'>{errors.username?.message}</p>
@@ -145,7 +121,6 @@ const Signup = () => {
 					id='email'
 					placeholder='Email'
 					{...register("email")}
-					onChange={handleChange}
 					className='p-3 border-2 rounded-lg w-full text-gray-700 border-zinc-300 focus:outline-none focus:border-zinc-400'
 				/>
 				<p className='text-red-700'>{errors.email?.message}</p>
@@ -157,7 +132,6 @@ const Signup = () => {
 						className='w-full border-none outline-none text-gray-700'
 						id='password'
 						{...register("password")}
-						onChange={handleChange}
 					/>
 					<div
 						onClick={() => setVisible(!visible)}
@@ -175,7 +149,6 @@ const Signup = () => {
 						className='w-full border-none outline-none text-gray-700'
 						id='confirmPassword'
 						{...register("confirmPassword")}
-						onChange={handleChange}
 					/>
 				</div>
 				<p className='text-red-700'>{errors.confirmPassword?.message}</p>

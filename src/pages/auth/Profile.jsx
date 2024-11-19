@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 /* eslint-disable no-unused-vars */
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,21 +12,9 @@ import { app } from "../../firebase";
 import { toast } from "react-toastify";
 import { signout, updateUser } from "../../redux/auth/authSlices";
 import { useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import ConfirmationModal from "../../components/modal/Modal";
-import {
-	confirmPasswordValidator,
-	passwordValidator,
-} from "../../hooks/PasswordValidators/PasswordValidators";
-
-const schema = yup.object().shape({
-	username: yup.string().optional(),
-	email: yup.string().email("Invalid email").optional(),
-	password: passwordValidator.optional(),
-	confirmPassword: confirmPasswordValidator("password").optional(),
-});
+import PasswordValidationModal from "../../components/modal/PasswordValidationModal";
+import { useFormSetup } from "../../hooks/useFormSetup/useFormSetup";
+import ConfirmationModal from "../../components/modal/ConfirmationModal";
 
 const Profile = () => {
 	const { currentUser, loading } = useSelector((state) => state.auth);
@@ -40,15 +29,16 @@ const Profile = () => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [showUpdateForm, setShowUpdateForm] = useState(false);
 
+	const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
+	const [emailToUpdate, setEmailToUpdate] = useState("");
+
 	const { avatar, username, email, id } = currentUser?.sanitizedUser || {};
 
 	const {
 		register,
 		handleSubmit,
 		formState: { errors },
-	} = useForm({
-		resolver: yupResolver(schema),
-	});
+	} = useFormSetup("profile");
 
 	useEffect(() => {
 		if (file) {
@@ -97,17 +87,32 @@ const Profile = () => {
 		);
 	};
 
-	const handleChange = (e) => {
-		setFormData({
-			...formData,
-			[e.target.id]: e.target.value,
-		});
+	const handlePasswordValidation = async (password) => {
+		try {
+			// Simulate password validation (replace with actual dispatch/API call)
+			const isValid = await dispatch(signout({ password })).unwrap();
+			if (isValid) {
+				// Proceed to update email after successful password validation
+				await dispatch(
+					updateUser({
+						id,
+						userData: { email: emailToUpdate },
+					})
+				).unwrap();
+				toast.success("Email updated successfully!");
+				setPasswordModalOpen(false);
+			} else {
+				toast.error("Invalid password. Please try again.");
+			}
+		} catch (err) {
+			toast.error("Error validating password. Please try again.");
+		}
 	};
 
 	const onSubmit = async (data) => {
-		try {
-			const isEmailUpdated = data.email && data.email !== email;
+		const isEmailUpdated = data.email && data.email !== email;
 
+		try {
 			const res = await dispatch(
 				updateUser({
 					id,
@@ -123,7 +128,9 @@ const Profile = () => {
 					navigate("/signin");
 				}
 			}
-		} catch (err) {}
+		} catch (err) {
+			console.error("Error updating profile:", err);
+		}
 	};
 
 	const handleSignout = async () => {
@@ -172,13 +179,14 @@ const Profile = () => {
 							<span className='font-semibold text-gray-700'>{email}</span>
 						</p>
 					</div>
-					{/* <hr className='my-6 border-gray-300' /> */}
-					<button
-						className='bg-zinc-800 my-6 text-white py-3 px-6 rounded-lg hover:bg-zinc-700 transition-all'
-						onClick={toggleUpdateForm}
-					>
-						Update
-					</button>
+					<div className=' flex justify-end'>
+						<button
+							className='bg-zinc-800 my-6 text-white py-3 px-6 rounded-lg hover:bg-zinc-700 transition-all'
+							onClick={toggleUpdateForm}
+						>
+							Update
+						</button>
+					</div>
 				</>
 			) : (
 				// Display Update Form when toggled
@@ -215,7 +223,6 @@ const Profile = () => {
 							defaultValue={formData.username || username}
 							className='border-2 border-gray-300 rounded-lg p-3 w-full text-gray-700 focus:border-indigo-500 focus:outline-none'
 							placeholder='Update Username'
-							onChange={handleChange}
 							{...register("username")}
 						/>
 						<p className='text-red-600'>{errors.username?.message}</p>
@@ -226,8 +233,13 @@ const Profile = () => {
 							defaultValue={formData.email || email}
 							className='border-2 border-gray-300 rounded-lg p-3 w-full text-gray-700 focus:border-indigo-500 focus:outline-none'
 							placeholder='Update Email'
-							onChange={handleChange}
 							{...register("email")}
+							onBlur={(e) => {
+								if (e.target.value !== email) {
+									setEmailToUpdate(e.target.value);
+									setPasswordModalOpen(true);
+								}
+							}}
 						/>
 						<p className='text-red-600'>{errors.email?.message}</p>
 
@@ -236,7 +248,6 @@ const Profile = () => {
 							id='password'
 							placeholder='Update Password'
 							className='border-2 border-gray-300 rounded-lg p-3 w-full text-gray-700 focus:border-indigo-500 focus:outline-none'
-							onChange={handleChange}
 							{...register("password")}
 						/>
 						<p className='text-red-600'>{errors.password?.message}</p>
@@ -271,7 +282,7 @@ const Profile = () => {
 			<div className='flex justify-end'>
 				<button
 					onClick={toggleModal}
-					className='bg-red-800 text-white py-3 px-6 rounded-lg hover:bg-red-500 transition-all disabled:opacity-80'
+					className='bg-red-700 text-white py-3 px-6 rounded-lg hover:opacity-90 transition-all disabled:opacity-80'
 				>
 					Signout
 				</button>
@@ -286,6 +297,11 @@ const Profile = () => {
 					}}
 				/>
 			</div>
+			<PasswordValidationModal
+				isOpen={isPasswordModalOpen}
+				onClose={() => setPasswordModalOpen(false)}
+				onConfirm={handlePasswordValidation}
+			/>
 		</div>
 	);
 };

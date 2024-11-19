@@ -3,26 +3,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { resetPassword } from "../../redux/auth/authSlices";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import {
-	confirmPasswordValidator,
-	passwordValidator,
-} from "../../hooks/PasswordValidators/PasswordValidators";
-
-const schema = yup.object().shape({
-	password: passwordValidator,
-	confirmPassword: confirmPasswordValidator("password"),
-});
+import { useFormSetup } from "../../hooks/useFormSetup/useFormSetup";
 
 const ResetPassword = () => {
 	const { message: authMessage, error: authError } = useSelector(
 		(state) => state.auth
 	);
 
-	const [newPassword, setNewPassword] = useState("");
-	const [confirmNewPassword, setConfirmNewPassword] = useState("");
 	const [loading, setLoading] = useState(false);
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
@@ -34,22 +21,15 @@ const ResetPassword = () => {
 		register,
 		handleSubmit,
 		formState: { errors },
-	} = useForm({
-		resolver: yupResolver(schema),
-	});
+	} = useFormSetup("resetPassword");
 
 	const onSubmit = async (data) => {
-		if (newPassword !== confirmNewPassword) {
-			return;
-		}
-
 		try {
 			setLoading(true);
 			const res = await dispatch(
 				resetPassword({
 					token,
-					newPassword: data.newPassword,
-					confirmNewPassword,
+					newPassword: data.password,
 				})
 			).unwrap();
 
@@ -85,6 +65,7 @@ const ResetPassword = () => {
 							} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
 							placeholder='Enter new password'
 						/>
+						<p className='text-red-600'>{errors.password?.message}</p>
 					</div>
 
 					<div className='mb-6'>
@@ -103,6 +84,7 @@ const ResetPassword = () => {
 							} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
 							placeholder='Confirm new password'
 						/>
+						<p className='text-red-600'>{errors.confirmPassword?.message}</p>
 					</div>
 
 					<button
