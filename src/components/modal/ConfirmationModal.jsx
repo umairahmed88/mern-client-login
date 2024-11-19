@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useEffect } from "react";
 
 const ConfirmationModal = ({ title, message, isOpen, onClose, onConfirm }) => {

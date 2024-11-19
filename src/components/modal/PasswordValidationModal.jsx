@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState } from "react";
 
 const PasswordValidationModal = ({ isOpen, onClose, onConfirm }) => {
@@ -10,7 +11,6 @@ const PasswordValidationModal = ({ isOpen, onClose, onConfirm }) => {
 		setError("");
 
 		try {
-			// Simulate password validation
 			const isValid = await onConfirm(password);
 			if (!isValid) {
 				setError("Invalid password. Please try again.");
@@ -18,7 +18,6 @@ const PasswordValidationModal = ({ isOpen, onClose, onConfirm }) => {
 				return;
 			}
 
-			// Close the modal on successful validation
 			onClose();
 		} catch (err) {
 			setError("An error occurred. Please try again.");
@@ -33,7 +32,7 @@ const PasswordValidationModal = ({ isOpen, onClose, onConfirm }) => {
 		<div className='fixed inset-0 bg-gray-600 bg-opacity-10 flex justify-center items-center z-50'>
 			<div className='bg-white p-6 rounded-lg shadow-lg max-w-sm w-full'>
 				<p className='mb-4'>
-					Please enter your password to proceed with the update.
+					Please enter your password to proceed with the email update.
 				</p>
 				<input
 					type='password'
