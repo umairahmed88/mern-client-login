@@ -18,9 +18,9 @@ const AppRoutes = () => (
 		<Route path='/signin' element={<Signin />} />
 		<Route path='/verify-email' element={<VerifyEmail />} />
 		<Route path='/reset-password' element={<ResetPassword />} />
-		{/* <Route element={<PrivateRoute />}> */}
-		<Route path='/profile' element={<Profile />} />
-		{/* </Route> */}
+		<Route element={<PrivateRoute />}>
+			<Route path='/profile' element={<Profile />} />
+		</Route>
 	</Routes>
 );
 

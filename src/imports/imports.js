@@ -8,7 +8,7 @@ export { default as PrivateRoute } from "../components/PrivateRoutes/PrivateRout
 export { default as VerifyEmail } from "../components/VerifyEmail";
 export { default as ResetPassword } from "../pages/auth/ResetPassword";
 
-export { default as Home } from "../pages/Home";
+export { default as Home } from "../pages/Home/Home";
 
 export { default as Signin } from "../pages/auth/Signin";
 export { default as Signup } from "../pages/auth/Signup";
